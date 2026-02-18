@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Discipline Master 2026 - MASTER1</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2C3E50">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1063/1063376.png">
+
+    <style>
+        :root {
+            --bg: #AAC7DB; --slate: #2C3E50;
+            --water: #3498DB; --gold: #B8860B; --success: #27ae60; --danger: #e74c3c;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; background-color: var(--bg); 
+            margin: 0; color: var(--slate); overflow: hidden; height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .main-wrapper { position: relative; z-index: 10; height: 100vh; overflow-y: auto; scroll-behavior: smooth; padding-bottom: 50px; }
+
+        .nav-tabs { 
+            display: flex; background: var(--slate); justify-content: center; 
+            padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .tab-btn { 
+            background: none; border: none; color: #95A5A6; padding: 10px 15px; 
+            cursor: pointer; font-weight: 700; transition: 0.3s; font-size: 0.8rem;
+        }
+        .tab-btn.active { color: #FFF; border-bottom: 3px solid #FFF; transform: translateY(-2px); }
+
+        .main-layout { max-width: 1400px; margin: 20px auto; padding: 0 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        .left-panel { text-align: center; margin-bottom: 30px; }
+        .bottle-shape {
+            width: 70px; height: 200px; margin: 0 auto 15px; position: relative;
+            background: rgba(255, 255, 255, 0.3); border: 4px solid var(--slate);
+            border-radius: 15px 15px 40px 40px; backdrop-filter: blur(8px);
+        }
+        #waterFill { 
+            position: absolute; bottom: 0; width: 100%; height: 0%; 
+            background: var(--water); transition: 1.5s ease-in-out; border-radius: 0 0 35px 35px; 
+        }
+
+        .timeline-container { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; width: 100%; padding-bottom: 100px; 
+        }
+        .day-row { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(230, 230, 230, 0.9); padding: 12px 5px; border-radius: 10px; 
+            cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.4); 
+            backdrop-filter: blur(10px); min-height: 110px; position: relative;
+        }
+        .day-row:hover { background: #FFF; }
+        .day-row.today { border: 2.5px solid var(--slate); background: #FFF; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+
+        .meal-tooltip {
+            display: none; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%);
+            background: var(--slate); color: white; padding: 10px; border-radius: 8px;
+            width: 170px; z-index: 9999; box-shadow: 0 8px 15px rgba(0,0,0,0.4); font-size: 0.7rem; pointer-events: none;
+        }
+        .day-row:hover .meal-tooltip { display: block; }
+        .tooltip-line { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 3px 0; display: flex; justify-content: space-between; }
+
+        .day-num { font-weight: 900; font-size: 0.75rem; margin-bottom: 5px; color: var(--slate); }
+        .data-val { font-size: 0.75rem; font-weight: 800; color: var(--gold); }
+        .indicator { width: 100%; height: 5px; border-radius: 3px; margin-top: 8px; background: rgba(0,0,0,0.05); }
+        
+        .done-w { background: var(--water) !important; box-shadow: 0 0 10px var(--water); }
+        .done-d { background: var(--gold) !important; box-shadow: 0 0 8px var(--gold); }
+        .done-g { background: var(--success) !important; box-shadow: 0 0 8px var(--success); }
+        .rest-g { background: var(--danger) !important; box-shadow: 0 0 8px var(--danger); }
+
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 450px; text-align: center; max-height: 85vh; overflow-y: auto; }
+        .modal-meal-block { margin-bottom: 10px; padding: 8px; background: #f1f1f1; border-radius: 10px; text-align: left; }
+        .macro-inputs { display: flex; gap: 4px; margin-top: 5px; }
+        input, select { width: 100%; padding: 10px; margin: 4px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 0.85rem; }
+        .btn-main { background: var(--slate); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 800; width: 100%; margin-top: 10px; }
+
+        .wa-float { position: fixed; bottom: 20px; right: 20px; background: #27AE60; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; border: none; cursor: pointer; z-index: 2000; box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+        .forest-view { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 30px; font-size: 2.5rem; }
+
+        .lib-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
+        .lib-table th { background: var(--slate); color: white; padding: 6px; }
+        .lib-table td { padding: 6px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="main-wrapper">
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="tab('h', '#3498DB')">WATER</button>
+        <button class="tab-btn" onclick="tab('l', '#9b59b6')">LIBRARY</button>
+        <button class="tab-btn" onclick="tab('d', '#B8860B')">DIET</button>
+        <button class="tab-btn" onclick="tab('g', '#4B7E55')">GYM</button>
+        <button class="tab-btn" onclick="tab('f', '#FFF')">FOREST</button>
+    </nav>
+
+    <section id="h" class="container">
+        <div class="main-layout">
+            <div class="left-panel">
+                <div class="bottle-shape"><div id="waterFill"></div></div>
+                <h1 id="lVal" style="font-size: 2.5rem; margin: 5px 0;">0.00L</h1>
+                <div style="display:flex; gap:8px; justify-content:center;">
+                    <input type="number" id="mlAdd" placeholder="mL" style="width:80px;">
+                    <button class="btn-main" onclick="addW()" style="width:50px; margin:5px 0;">+</button>
+                </div>
+            </div>
+            <div class="timeline-container" id="hTimeline"></div>
+        </div>
+    </section>
+
+    <section id="l" class="container" style="display:none;">
+        <div class="main-layout">
+            <div class="modal-content" style="box-shadow: none; border: 1px solid #ccc; width: 100%;">
+                <h3>Food Master</h3>
+                <div class="macro-inputs">
+                    <input type="text" id="libName" placeholder="Name">
+                    <input type="number" id="libP" placeholder="P">
+                    <input type="number" id="libC" placeholder="C">
+                    <input type="number" id="libCal" placeholder="Cal">
+                </div>
+                <button class="btn-main" onclick="addFoodToLib()">Save Food</button>
+                <div style="max-height: 300px; overflow-y: auto; margin-top: 20px;">
+                    <table class="lib-table">
+                        <thead><tr><th>Food</th><th>P</th><th>C</th><th>Cal</th><th></th></tr></thead>
+                        <tbody id="libBody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
+                    <button onclick="exportDB()" style="font-size:0.7rem;">Backup Data</button>
+                    <button onclick="importDB()" style="font-size:0.7rem;">Restore Data</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="d" class="container" style="display:none;">
+        <div class="main-layout">
+            <div class="left-panel">
+                <h2 style="margin:0; font-size: 1rem;">P 120g | C 125g | Cal 1800</h2>
+                <h1 id="todayCal" style="font-size: 3rem; color:var(--gold); margin:5px 0;">0</h1>
+            </div>
+            <div class="timeline-container" id="dTimeline"></div>
+        </div>
+    </section>
+
+    <section id="g" class="container" style="display:none;">
+        <div class="main-layout">
+            <div class="left-panel"><h1 id="monthHeader" style="font-size: 1.5rem;"></h1></div>
+            <div class="timeline-container" id="gTimeline"></div>
+        </div>
+    </section>
+
+    <section id="f" class="container" style="display:none;">
+        <div class="main-layout">
+            <div class="forest-view" id="forestLand"></div>
+        </div>
+    </section>
+</div>
+
+<div id="dietModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Log Day</h3>
+        <div id="mealInputs"></div>
+        <button class="btn-main" onclick="saveDiet()">SAVE LOG</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">Close</button>
+    </div>
+</div>
+
+<button class="wa-float" onclick="shareReport()">📲</button>
+
+<script>
+    const GOAL_W = 6000; const GOAL_C = 1800; const C_LIMIT = 125; const P_GOAL = 120;
+    const now = new Date(); const curM = now.getMonth(); const curY = now.getFullYear();
+    const today = now.getDate(); const mName = now.toLocaleString('default', { month: 'short' });
+    const daysCount = new Date(curY, curM + 1, 0).getDate();
+
+    let db = {
+        w: JSON.parse(localStorage.getItem('mast_w')) || {},
+        g: JSON.parse(localStorage.getItem('mast_g')) || {},
+        d: JSON.parse(localStorage.getItem('mast_d')) || {},
+        m: JSON.parse(localStorage.getItem('mast_m')) || {},
+        lib: JSON.parse(localStorage.getItem('mast_lib')) || []
+    };
+    let selectedK = "";
+
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = []; let firecrackers = []; 
+    let pColor = '#3498DB';
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Particle {
+        constructor(isFirecracker = false) { this.init(isFirecracker); }
+        init(isFirecracker) {
+            this.isFirecracker = isFirecracker;
+            if(isFirecracker) {
+                this.x = canvas.width / 2; this.y = canvas.height / 2;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 8 + 4;
+                this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
+                this.s = Math.random() * 4 + 2; this.o = 1;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            } else {
+                this.x = Math.random()*canvas.width; this.y = canvas.height+20;
+                this.vx = 0; this.vy = -(Math.random()*1+0.5);
+                this.s = Math.random()*5+2; this.o = Math.random()*0.4+0.2;
+                this.color = pColor;
+            }
+        }
+        update() {
+            if(this.isFirecracker) {
+                this.x += this.vx; this.y += this.vy;
+                this.vy += 0.1; this.o -= 0.01;
+                if(this.o <= 0) return false;
+            } else {
+                this.y += this.vy;
+                if(this.y < -20) this.init(false);
+            }
+            return true;
+        }
+        draw() {
+            ctx.fillStyle = this.isFirecracker ? this.color : pColor;
+            ctx.globalAlpha = this.o;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    for(let i=0; i<40; i++) particles.push(new Particle(false));
+    function triggerFirecrackers() { for(let i=0; i<80; i++) firecrackers.push(new Particle(true)); }
+
+    function anim() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        firecrackers = firecrackers.filter(f => { const alive = f.update(); if(alive) f.draw(); return alive; });
+        requestAnimationFrame(anim);
+    }
+    anim();
+
+    function getK(d) { return `${curY}-${curM+1}-${d}`; }
+
+    function addW() {
+        const input = document.getElementById('mlAdd');
+        const v = parseInt(input.value) || 0;
+        const oldVal = db.w[getK(today)] || 0;
+        const newVal = oldVal + v;
+        db.w[getK(today)] = newVal;
+        localStorage.setItem('mast_w', JSON.stringify(db.w));
+        if(oldVal < GOAL_W && newVal >= GOAL_W) triggerFirecrackers();
+        input.value = ""; refresh();
+    }
+
+    function tab(id, color) {
+        document.querySelectorAll('section, .tab-btn').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('section').forEach(el => el.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        if(event) event.currentTarget.classList.add('active');
+        pColor = color; refresh();
+    }
+
+    function addFoodToLib() {
+        const name = document.getElementById('libName').value;
+        const p = parseFloat(document.getElementById('libP').value) || 0;
+        const c = parseFloat(document.getElementById('libC').value) || 0;
+        const cal = parseFloat(document.getElementById('libCal').value) || 0;
+        if(!name) return;
+        db.lib.push({ name, p, c, cal });
+        localStorage.setItem('mast_lib', JSON.stringify(db.lib));
+        document.getElementById('libName').value = '';
+        refresh();
+    }
+
+    function autoCalc(mK) {
+        const sel = document.getElementById(`sel${mK}`);
+        const gr = parseFloat(document.getElementById(`gr${mK}`).value) || 0;
+        const f = db.lib[sel.value];
+        if(f && gr > 0) {
+            document.getElementById(`food${mK}`).value = f.name;
+            document.getElementById(`p${mK}`).value = Math.round((f.p/100)*gr);
+            document.getElementById(`c${mK}`).value = Math.round((f.c/100)*gr);
+            document.getElementById(`cal${mK}`).value = Math.round((f.cal/100)*gr);
+        }
+    }
+
+    function buildModalInputs() {
+        const meals = [{k:'B', n:'Breakfast'}, {k:'L', n:'Lunch'}, {k:'S', n:'Snack'}, {k:'D', n:'Dinner'}];
+        let h = '';
+        meals.forEach(m => {
+            h += `<div class="modal-meal-block">
+                <b>${m.n}</b>
+                <div style="display:flex; gap:5px;">
+                    <select id="sel${m.k}" onchange="autoCalc('${m.k}')"><option value="">Quick Add...</option>
+                        ${db.lib.map((f, i) => `<option value="${i}">${f.name}</option>`).join('')}
+                    </select>
+                    <input type="number" id="gr${m.k}" placeholder="Grams" oninput="autoCalc('${m.k}')" style="width:70px;">
+                </div>
+                <input type="text" id="food${m.k}" placeholder="Food">
+                <div class="macro-inputs">
+                    <input type="number" id="p${m.k}" placeholder="P"><input type="number" id="c${m.k}" placeholder="C"><input type="number" id="cal${m.k}" placeholder="Cal">
+                </div>
+            </div>`;
+        });
+        document.getElementById('mealInputs').innerHTML = h;
+    }
+
+    function saveDiet() {
+        const meals = ['B', 'L', 'S', 'D'];
+        let tCal = 0, tC = 0, tP = 0, details = {};
+        meals.forEach(m => {
+            details[m] = { 
+                food: document.getElementById(`food${m}`).value,
+                p: parseInt(document.getElementById(`p${m}`).value) || 0,
+                c: parseInt(document.getElementById(`c${m}`).value) || 0,
+                cal: parseInt(document.getElementById(`cal${m}`).value) || 0
+            };
+            tCal += details[m].cal; tC += details[m].c; tP += details[m].p;
+        });
+        db.d[selectedK] = details; db.m[selectedK] = { cal: tCal, carbs: tC, protein: tP };
+        localStorage.setItem('mast_d', JSON.stringify(db.d));
+        localStorage.setItem('mast_m', JSON.stringify(db.m));
+        closeModal(); refresh();
+    }
+
+    function toggleGym(k) {
+        if (db.g[k] === true) db.g[k] = false; 
+        else if (db.g[k] === false) delete db.g[k]; 
+        else db.g[k] = true;
+        localStorage.setItem('mast_g', JSON.stringify(db.g));
+        refresh();
+    }
+
+    function refresh() {
+        const libB = document.getElementById('libBody'); libB.innerHTML = '';
+        db.lib.forEach((f, i) => { libB.innerHTML += `<tr><td>${f.name}</td><td>${f.p}</td><td>${f.c}</td><td>${f.cal}</td><td onclick="removeFood(${i})" style="color:red; cursor:pointer;">✖</td></tr>`; });
+
+        const curW = db.w[getK(today)] || 0;
+        document.getElementById('waterFill').style.height = Math.min(100, (curW/GOAL_W)*100) + "%";
+        document.getElementById('lVal').innerText = (curW/1000).toFixed(2) + "L";
+        document.getElementById('todayCal').innerText = (db.m[getK(today)] || {cal:0}).cal;
+
+        const hT = document.getElementById('hTimeline'); hT.innerHTML = "";
+        const dT = document.getElementById('dTimeline'); dT.innerHTML = "";
+        const gT = document.getElementById('gTimeline'); gT.innerHTML = "";
+        document.getElementById('monthHeader').innerText = now.toLocaleString('default',{month:'long'}) + " " + curY;
+
+        for(let i=1; i<=daysCount; i++) {
+            const k = getK(i); const isT = i === today;
+            
+            hT.innerHTML += `<div class="day-row ${isT?'today':''}">
+                <span class="day-num">${i} ${mName}</span><span class="data-val">${(db.w[k]||0)/1000}L</span>
+                <div class="indicator ${db.w[k]>=GOAL_W?'done-w':''}"></div></div>`;
+
+            const log = db.d[k]; const sum = db.m[k] || {cal:0, carbs:0, protein:0};
+            const met = sum.cal > 0 && sum.carbs <= C_LIMIT && sum.protein >= P_GOAL;
+            let dHtml = `<div class="day-row ${isT?'today':''}" onclick="openDietModal('${k}',${i})"><span class="day-num">${i} ${mName}</span>`;
+            if(log) {
+                let tool = `<div class="meal-tooltip">`;
+                ['B','L','S','D'].forEach(m => { tool += `<div class="tooltip-line"><span><b>${m}:</b> ${log[m].food||'-'}</span><span>${log[m].cal}c</span></div>`; });
+                dHtml += tool + `</div><span class="data-val">${sum.cal} cal</span><span style="font-size:0.6rem; font-weight:700; color:${sum.protein>=P_GOAL?'var(--success)':'var(--danger)'}">P: ${sum.protein}g</span>`;
+            } else { dHtml += `<span class="data-val">-</span>`; }
+            dHtml += `<div class="indicator ${met?'done-d':''}"></div></div>`;
+            dT.innerHTML += dHtml;
+
+            let gS = db.g[k]; let gTxt = gS===true?'GYM':(gS===false?'REST':'-');
+            gT.innerHTML += `<div class="day-row ${isT?'today':''}" onclick="toggleGym('${k}')">
+                <span class="day-num">${i} ${mName}</span><span class="data-val" style="color:${gS===false?'var(--danger)':'var(--success)'}">${gTxt}</span>
+                <div class="indicator ${gS===true?'done-g':(gS===false?'rest-g':'')}"></div></div>`;
+        }
+
+        const fL = document.getElementById('forestLand'); fL.innerHTML = "";
+        Object.values(db.g).forEach(v => v === true && (fL.innerHTML += '🌲'));
+        Object.values(db.w).forEach(v => v >= GOAL_W && (fL.innerHTML += '💧'));
+        Object.values(db.m).forEach(v => (v.cal > 0 && v.carbs <= C_LIMIT && v.protein >= P_GOAL) && (fL.innerHTML += '🍎'));
+    }
+
+    function openDietModal(k, i) {
+        selectedK = k; document.getElementById('modalTitle').innerText = `Log ${i} ${mName}`;
+        buildModalInputs();
+        const log = db.d[k];
+        if(log) ['B','L','S','D'].forEach(m => { 
+            document.getElementById(`food${m}`).value = log[m].food;
+            document.getElementById(`p${m}`).value = log[m].p;
+            document.getElementById(`c${m}`).value = log[m].c;
+            document.getElementById(`cal${m}`).value = log[m].cal;
+        });
+        document.getElementById('dietModal').style.display='flex';
+    }
+
+    function exportDB() { 
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "discipline_backup.json"); dl.click();
+    }
+    function importDB() {
+        const json = prompt("Paste backup JSON here:");
+        if(json) { try { db = JSON.parse(json); localStorage.setItem('mast_w', JSON.stringify(db.w)); localStorage.setItem('mast_g', JSON.stringify(db.g)); localStorage.setItem('mast_d', JSON.stringify(db.d)); localStorage.setItem('mast_m', JSON.stringify(db.m)); localStorage.setItem('mast_lib', JSON.stringify(db.lib)); refresh(); alert("Restored!"); } catch(e) { alert("Error"); } }
+    }
+
+    function removeFood(idx) { db.lib.splice(idx, 1); localStorage.setItem('mast_lib', JSON.stringify(db.lib)); refresh(); }
+    function closeModal() { document.getElementById('dietModal').style.display = 'none'; }
+    function shareReport() {
+        const k = getK(today); const s = db.m[k] || {cal:0, carbs:0, protein:0};
+        const msg = encodeURIComponent(`*8KG Discipline Report - ${mName} ${today}*\n💧 Water: ${(db.w[k]||0)/1000}L/6L\n🔥 Cal: ${s.cal}/1800\n💪 Prot: ${s.protein}g/120g\n🏋️ Gym: ${db.g[k]===true?'Done':(db.g[k]===false?'Rest':'-')}`);
+        window.open(`https://wa.me/?text=${msg}`);
+    }
+    refresh();
+</script>
+</body>
+</html>
