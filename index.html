@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#2C3E50">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1063/1063376.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Discipline Master 2026 - MASTER1</title>
@@ -14,254 +9,235 @@
             --primary: #0f172a; --accent: #38bdf8; 
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --success: #22c55e; --danger: #ef4444; --text: #f1f5f9;
+            --success: #10b981; --danger: #f43f5e; --text: #f1f5f9;
+            --protein: #818cf8; --carbs: #fbbf24; --fat: #f472b6;
         }
 
         body { 
             font-family: 'Inter', system-ui, sans-serif; 
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             margin: 0; color: var(--text); min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .header { 
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
-            padding: 20px; display: flex; justify-content: space-around; 
-            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--glass-border);
-        }
-        .header h4 { margin: 0; font-size: 0.6rem; letter-spacing: 1px; color: var(--accent); text-transform: uppercase; }
+        /* HEADER & STATS */
+        .header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); padding: 15px; display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--glass-border); }
+        .header h4 { margin: 0; font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         .header p { margin: 2px 0 0; font-weight: 800; font-size: 1.2rem; }
 
-        .nav-container { position: sticky; top: 85px; z-index: 999; background: rgba(15, 23, 42, 0.9); padding: 10px 20px; }
-        nav { display: flex; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 5px; position: relative; border: 1px solid var(--glass-border); }
+        /* JUMP TO DATE BAR */
+        .jump-bar { background: rgba(56, 189, 248, 0.08); padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); }
+        .jump-bar label { font-size: 0.75rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+        .jump-bar input { background: var(--primary); border: 1px solid var(--accent); color: white; padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; font-family: inherit; }
 
-        #nav-indicator {
-            position: absolute; top: -2px; height: 3px; background: var(--accent);
-            border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--accent); z-index: 10;
-        }
-
-        .tab-btn { 
-            flex: 1; padding: 12px 5px; border: none; background: none; 
-            color: #64748b; font-weight: 700; cursor: pointer; 
-            transition: 0.3s; border-radius: 8px; font-size: 0.7rem; text-transform: uppercase;
-        }
+        /* NAVIGATION */
+        .nav-container { position: sticky; top: 70px; z-index: 999; background: rgba(15, 23, 42, 0.9); padding: 10px; }
+        nav { display: flex; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 4px; position: relative; border: 1px solid var(--glass-border); }
+        #nav-indicator { position: absolute; top: -2px; height: 3px; background: var(--accent); border-radius: 10px; transition: 0.3s; z-index: 10; }
+        .tab-btn { flex: 1; padding: 12px 2px; border: none; background: none; color: #64748b; font-weight: 700; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; z-index: 11; }
         .tab-btn.active { color: var(--accent); }
 
-        .date-nav { padding: 15px 20px; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .date-nav select { 
-            background: #1e293b; color: #ffffff !important; border: 1px solid var(--accent); 
-            padding: 10px; border-radius: 10px; font-weight: 800; appearance: none; cursor: pointer;
-        }
-        .clear-btn { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 10px 12px; border-radius: 10px; cursor: pointer; display: none; }
+        /* CONTENT AREA */
+        .content { padding: 0 15px 120px; max-width: 600px; margin: auto; }
+        section { display: none; }
+        section.active { display: block !important; }
 
-        .content { padding: 0 20px 120px; max-width: 800px; margin: auto; }
-        section { display: none; animation: fadeIn 0.4s ease-out; }
-        section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* BOTTLE STYLING */
-        .water-display-wrapper {
-            display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px;
-        }
-        .bottle-container {
-            width: 120px; height: 50px; border: 2px solid var(--accent);
-            border-radius: 8px 25px 25px 8px; position: relative;
-            background: rgba(56, 189, 248, 0.05); overflow: hidden;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        }
-        /* The Cap */
-        .bottle-container::before {
-            content: ''; position: absolute; left: -8px; top: 12px;
-            width: 8px; height: 26px; background: #94a3b8; border-radius: 4px 0 0 4px;
-        }
-        #bottle-fill {
-            height: 100%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-            width: 100%; transition: width 0.5s ease-in-out;
-            box-shadow: inset -5px 0 15px rgba(255,255,255,0.3);
-            float: right; /* Makes it empty from right to left */
-        }
-
-        .cal-board { 
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(15, 23, 42, 0.5));
-            padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 25px;
-        }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; }
+        /* READABLE GRID (4 Columns for Phone/Web) */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
         .card { 
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 15px 10px; border-radius: 16px; text-align: center; cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            padding: 12px 5px; border-radius: 14px; text-align: center; cursor: pointer;
+            min-height: 90px; display: flex; flex-direction: column; justify-content: center;
         }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .card.today { border: 2px solid var(--accent); }
-        .val { font-size: 0.9rem; font-weight: 800; margin: 5px 0; color: var(--accent); }
-        .macro-stack { font-size: 0.6rem; opacity: 0.7; display: flex; flex-direction: column; line-height: 1.3; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--glass-border); }
+        .card.today { 
+            border: 2px solid var(--accent) !important; 
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            background: rgba(56, 189, 248, 0.1);
+        }
+        .card span { font-size: 0.7rem; opacity: 0.7; font-weight: 700; display: block; margin-bottom: 4px; }
+        .val { font-size: 0.9rem; font-weight: 900; color: var(--accent); }
+        
+        /* MACROS IN DIET TAB */
+        .macro-labels { font-size: 0.58rem; display: flex; flex-direction: column; gap: 2px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; text-align: left; padding-left: 5px; }
+        .macro-labels b { font-weight: 800; }
+        .m-p { color: var(--protein); } .m-c { color: var(--carbs); } .m-f { color: var(--fat); }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-box { background: #1e293b; padding: 20px; border-radius: 24px; width: 95%; max-width: 420px; border: 1px solid var(--glass-border); }
-        input, select { background: #0f172a; border: 1px solid var(--glass-border); color: white; padding: 10px; border-radius: 12px; width: 100%; margin: 5px 0; box-sizing: border-box; }
-        .btn { background: var(--accent); color: var(--primary); border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; }
-        .meal-block { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--glass-border); }
+        /* DASHBOARDS */
+        .cal-board { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
+        .main-stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px; }
+        .macro-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
+        .progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .p-fill { height: 100%; width: 0%; transition: width 0.5s; }
+
+        /* BUTTONS & FORMS */
+        .btn { background: var(--accent); color: var(--primary); border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; text-transform: uppercase; font-size: 0.85rem; }
+        .wipe-btn { background: linear-gradient(135deg, #f43f5e, #be123c); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 0.8rem; margin-bottom: 15px; }
+        input, select { background: #0f172a; border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 6px 0; font-size: 0.95rem; box-sizing: border-box; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-box { background: #1e293b; padding: 25px; border-radius: 24px; width: 92%; max-height: 85vh; overflow-y: auto; border: 1px solid var(--glass-border); }
+        .meal-block { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--glass-border); }
     </style>
 </head>
 <body>
 
 <div class="header">
     <div><h4>Weight</h4><p id="h-weight">--</p></div>
-    <div><h4>To Lose</h4><p id="h-diff">--</p></div>
     <div><h4>Goal</h4><p>80.0</p></div>
+    <div><h4>Diff</h4><p id="h-diff">--</p></div>
+</div>
+
+<div class="jump-bar">
+    <label>Jump to Date</label>
+    <input type="date" id="datePicker" onchange="jumpToDate(this.value)">
 </div>
 
 <div class="nav-container">
-    <nav id="mainNav">
+    <nav>
         <div id="nav-indicator"></div>
-        <button class="tab-btn active" onclick="showTab('h', this)">Water</button>
-        <button class="tab-btn" onclick="showTab('wt', this)">Weight</button>
-        <button class="tab-btn" onclick="showTab('d', this)">Diet</button>
-        <button class="tab-btn" onclick="showTab('g', this)">Gym</button>
-        <button class="tab-btn" onclick="showTab('l', this)">Lib</button>
+        <button class="tab-btn active" id="btn-h" onclick="showTab('h', this)">Water</button>
+        <button class="tab-btn" id="btn-wt" onclick="showTab('wt', this)">Weight</button>
+        <button class="tab-btn" id="btn-d" onclick="showTab('d', this)">Diet</button>
+        <button class="tab-btn" id="btn-g" onclick="showTab('g', this)">Gym</button>
+        <button class="tab-btn" id="btn-l" onclick="showTab('l', this)">Lib</button>
     </nav>
-</div>
-
-<div class="date-nav">
-    <select id="jumpMonth" onchange="refresh()"></select>
-    <select id="jumpYear" onchange="refresh()"></select>
-    <button id="clearDayBtn" class="clear-btn" onclick="clearSpecificDay()">🗑️</button>
 </div>
 
 <div class="content">
     <section id="h" class="active">
-        <div class="water-display-wrapper">
-            <h1 id="totalWater" style="color:var(--accent); font-size: 3rem; margin: 0;">0.0L</h1>
-            <div class="bottle-container">
-                <div id="bottle-fill"></div>
-            </div>
-        </div>
-        <div style="display:flex; gap:10px; justify-content: center; margin-bottom: 30px;">
-            <input type="number" id="wInput" placeholder="mL" style="width: 100px;">
-            <button class="btn" onclick="addWaterToday()" style="width:60px;">+</button>
+        <h2 id="totalWater" style="text-align:center; font-size: 3.5rem; margin: 15px 0; color: var(--accent);">0.0L</h2>
+        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+            <input type="number" id="wInput" placeholder="mL" style="width:120px;">
+            <button class="btn" onclick="addWaterToday()" style="width:80px; margin:0;">ADD</button>
         </div>
         <div class="grid" id="hGrid"></div>
     </section>
 
     <section id="wt"><div class="grid" id="wtGrid"></div></section>
+
     <section id="d">
+        <button class="wipe-btn" onclick="clearDietDay()">🗑️ RESET SELECTED DAY</button>
         <div class="cal-board">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <div class="cal-stat"><h5>Target</h5><p>1800</p></div>
-                <div class="cal-stat"><h5>Cons.</h5><p id="board-consumed">0</p></div>
-                <div class="cal-stat"><h5>Rem.</h5><p id="board-rem">1800</p></div>
+            <div class="main-stats">
+                <div><h5>Target</h5><p>1800</p></div>
+                <div><h5>Eaten</h5><p id="board-consumed">0</p></div>
+                <div><h5>Left</h5><p id="board-rem">1800</p></div>
             </div>
-            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 15px;">
-                <div class="cal-stat"><h5>P (120)</h5><p id="board-p">0</p></div>
-                <div class="cal-stat"><h5>C (180)</h5><p id="board-c">0</p></div>
-                <div class="cal-stat"><h5>F (70)</h5><p id="board-f">0</p></div>
+            <div class="macro-row">
+                <div class="m-box"><span>P</span><b id="board-p">0g</b><div class="progress-bg"><div id="fill-p" class="p-fill" style="background:var(--protein)"></div></div></div>
+                <div class="m-box"><span>C</span><b id="board-c">0g</b><div class="progress-bg"><div id="fill-c" class="p-fill" style="background:var(--carbs)"></div></div></div>
+                <div class="m-box"><span>F</span><b id="board-f">0g</b><div class="progress-bg"><div id="fill-f" class="p-fill" style="background:var(--fat)"></div></div></div>
             </div>
         </div>
         <div class="grid" id="dGrid"></div>
     </section>
+
     <section id="g"><div class="grid" id="gGrid"></div></section>
+
     <section id="l">
         <div class="cal-board">
-            <h3>Library</h3>
+            <h4>Food Library</h4>
             <input type="text" id="ln" placeholder="Food Name">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="number" id="lcal" placeholder="Cal">
-                <input type="number" id="lp" placeholder="P">
-                <input type="number" id="lc" placeholder="C">
-                <input type="number" id="lf" placeholder="F">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <input type="number" id="lcal" placeholder="Cals/100g">
+                <input type="number" id="lp" placeholder="Protein">
+                <input type="number" id="lc" placeholder="Carbs">
+                <input type="number" id="lf" placeholder="Fat">
             </div>
-            <button class="btn" onclick="saveToLib()" style="margin-top: 10px;">SAVE FOOD</button>
-            <div id="libDisplay" style="margin-top:20px;"></div>
+            <button class="btn" style="margin-top:10px;" onclick="saveToLib()">+ ADD TO LIBRARY</button>
+            <div id="libDisplay" style="margin-top:20px; border-top: 1px solid var(--glass-border);"></div>
         </div>
     </section>
 </div>
 
 <div id="dietModal" class="modal">
     <div class="modal-box">
-        <h3 id="dietDateTitle" style="color:var(--accent); margin-top:0;">Log Meals</h3>
-        <div class="meal-block"><div id="list-breakfast"></div><div style="display:flex;gap:5px"><select id="sel-breakfast" class="food-sel"></select><input type="number" id="gram-breakfast" placeholder="g" style="width:70px"><button class="btn" style="width:40px; padding:0;" onclick="addToMeal('breakfast')">+</button></div></div>
-        <div class="meal-block"><div id="list-lunch"></div><div style="display:flex;gap:5px"><select id="sel-lunch" class="food-sel"></select><input type="number" id="gram-lunch" placeholder="g" style="width:70px"><button class="btn" style="width:40px; padding:0;" onclick="addToMeal('lunch')">+</button></div></div>
-        <div class="meal-block"><div id="list-snacks"></div><div style="display:flex;gap:5px"><select id="sel-snacks" class="food-sel"></select><input type="number" id="gram-snacks" placeholder="g" style="width:70px"><button class="btn" style="width:40px; padding:0;" onclick="addToMeal('snacks')">+</button></div></div>
-        <div class="meal-block"><div id="list-dinner"></div><div style="display:flex;gap:5px"><select id="sel-dinner" class="food-sel"></select><input type="number" id="gram-dinner" placeholder="g" style="width:70px"><button class="btn" style="width:40px; padding:0;" onclick="addToMeal('dinner')">+</button></div></div>
-        <button class="btn" onclick="finalSaveToDay()">SAVE ALL</button>
-        <button class="btn" style="background:none; color:var(--danger);" onclick="closeModals()">Close</button>
+        <h3 id="dietDateTitle" style="margin:0 0 15px 0; color:var(--accent);">Log Meals</h3>
+        <div class="meal-block"><b>BREAKFAST</b><div id="list-breakfast" style="font-size:0.75rem; color:#94a3b8; margin:5px 0;"></div><div style="display:flex;gap:8px;"><select id="sel-breakfast" class="food-sel"></select><input type="number" id="gram-breakfast" placeholder="g" style="width:80px;"><button onclick="addToMeal('breakfast')" class="btn" style="width:50px;margin:0;">+</button></div></div>
+        <div class="meal-block"><b>LUNCH</b><div id="list-lunch" style="font-size:0.75rem; color:#94a3b8; margin:5px 0;"></div><div style="display:flex;gap:8px;"><select id="sel-lunch" class="food-sel"></select><input type="number" id="gram-lunch" placeholder="g" style="width:80px;"><button onclick="addToMeal('lunch')" class="btn" style="width:50px;margin:0;">+</button></div></div>
+        <div class="meal-block"><b>DINNER</b><div id="list-dinner" style="font-size:0.75rem; color:#94a3b8; margin:5px 0;"></div><div style="display:flex;gap:8px;"><select id="sel-dinner" class="food-sel"></select><input type="number" id="gram-dinner" placeholder="g" style="width:80px;"><button onclick="addToMeal('dinner')" class="btn" style="width:50px;margin:0;">+</button></div></div>
+        <button class="btn" onclick="finalSaveToDay()">SAVE LOG</button>
+        <button class="btn" style="background:none; color:var(--danger); margin-top:10px;" onclick="closeModals()">CANCEL</button>
     </div>
 </div>
 
-<div id="wtModal" class="modal"><div class="modal-box"><h3 id="wtTitle">Log Weight</h3><input type="number" step="0.1" id="weightVal"><button class="btn" onclick="saveWeight()">SAVE</button></div></div>
+<div id="wtModal" class="modal"><div class="modal-box"><h3>Log Weight</h3><input type="number" step="0.1" id="weightVal"><button class="btn" onclick="saveWeight()">SAVE</button></div></div>
 
 <script>
     let db = JSON.parse(localStorage.getItem('M1_DB')) || { w:{}, wt:{}, g:{}, d:{}, m:{}, lib:[] };
     let tempDraft = { breakfast:[], lunch:[], snacks:[], dinner:[] };
     let activeK = "";
-    const TARGETS = { cal: 1800, p: 120, c: 180, f: 70, water: 6000 };
+    const TARGETS = { cal: 1800, p: 120, c: 180, f: 70 };
+
+    function jumpToDate(val) {
+        if(!val) return;
+        const [y, m, d] = val.split('-').map(Number);
+        activeK = `${y}-${m}-${d}`;
+        showTab('d', document.getElementById('btn-d'));
+        openDiet(activeK);
+    }
 
     function showTab(t, btn) {
-        document.querySelectorAll('section, .tab-btn').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
         document.getElementById(t).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const ind = document.getElementById('nav-indicator');
         ind.style.width = btn.offsetWidth + 'px'; ind.style.left = btn.offsetLeft + 'px';
-        document.getElementById('clearDayBtn').style.display = (t === 'd') ? 'block' : 'none';
         refresh();
     }
 
     function refresh() {
         localStorage.setItem('M1_DB', JSON.stringify(db));
-        const vM = document.getElementById('jumpMonth').value;
-        const vY = document.getElementById('jumpYear').value;
-        const tK = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+        const now = new Date();
+        const tK = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
         
-        // Water Bottle Logic
-        const waterToday = db.w[tK] || 0;
-        document.getElementById('totalWater').innerText = (waterToday/1000).toFixed(1) + 'L';
-        
-        // Bottle empties as you drink. Full (100%) at 0ml, Empty (0%) at 6000ml.
-        const fillPercent = Math.max(0, 100 - (waterToday / TARGETS.water * 100));
-        document.getElementById('bottle-fill').style.width = fillPercent + '%';
-
-        // Weight Logic
-        const wts = Object.values(db.wt).filter(v => v > 0);
-        const latest = wts[wts.length-1] || 0;
-        document.getElementById('h-weight').innerText = latest ? latest + 'kg' : '--';
-        document.getElementById('h-diff').innerText = latest ? (latest - 80).toFixed(1) + 'kg' : '--';
-
-        // Diet Logic
         const m = db.m[tK] || {cal:0, p:0, c:0, f:0};
         document.getElementById('board-consumed').innerText = m.cal || 0;
         document.getElementById('board-rem').innerText = TARGETS.cal - (m.cal || 0);
-        document.getElementById('board-rem').style.color = (TARGETS.cal - m.cal) < 0 ? 'var(--danger)' : 'var(--success)';
-        ['p','c','f'].forEach(macro => {
-            const el = document.getElementById(`board-${macro}`);
-            el.innerText = (m[macro]||0) + "g";
-            el.style.color = (m[macro]||0) >= TARGETS[macro] ? 'var(--success)' : 'var(--accent)';
+        ['p','c','f'].forEach(x => {
+            document.getElementById(`board-${x}`).innerText = (m[x]||0) + "g";
+            document.getElementById(`fill-${x}`).style.width = Math.min(100, ((m[x]||0)/TARGETS[x])*100) + '%';
         });
 
-        renderGrids(vM, vY); renderLib();
+        document.getElementById('totalWater').innerText = ((db.w[tK]||0)/1000).toFixed(1) + 'L';
+        const wts = Object.values(db.wt).filter(v => v > 0);
+        const lastWt = wts[wts.length-1] || 0;
+        document.getElementById('h-weight').innerText = lastWt ? lastWt + 'kg' : '--';
+        document.getElementById('h-diff').innerText = lastWt ? (lastWt - 80).toFixed(1) : '--';
+
+        renderGrids(now.getMonth()+1, now.getFullYear());
+        renderLib();
     }
 
     function renderGrids(m, y) {
-        const days = new Date(y, m, 0).getDate();
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
         const mNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const days = new Date(y, m, 0).getDate();
+        
         ['hGrid','wtGrid','dGrid','gGrid'].forEach(id => {
             const container = document.getElementById(id); container.innerHTML = "";
             for(let i=1; i<=days; i++) {
-                let k = `${y}-${m}-${i}`, disp = "", cls = "";
+                let k = `${y}-${m}-${i}`, disp = "";
+                let isToday = (k === todayStr) ? "today" : "";
+
                 if(id==='hGrid') disp = `<div class="val">${((db.w[k]||0)/1000).toFixed(1)}L</div>`;
                 if(id==='wtGrid') disp = `<div class="val">${db.wt[k] || '--'}</div>`;
                 if(id==='dGrid') {
                     let dm = db.m[k] || {cal:0, p:0, c:0, f:0};
-                    disp = `<div class="val">${dm.cal||0}c</div><div class="macro-stack"><span>P:${dm.p||0} C:${dm.c||0}</span><span>F:${dm.f||0}</span></div>`;
+                    disp = `<div class="val">${dm.cal||0} kcal</div>
+                            <div class="macro-labels">
+                                <span class="m-p">P: <b>${dm.p||0}g</b></span>
+                                <span class="m-c">C: <b>${dm.c||0}g</b></span>
+                                <span class="m-f">F: <b>${dm.f||0}g</b></span>
+                            </div>`;
                 }
-                if(id==='gGrid') {
-                    let s = db.g[k] || 0;
-                    if(s===1) { cls="gym-success"; disp=`<div class="val">DONE</div>`; }
-                    else if(s===2) { cls="gym-missed"; disp=`<div class="val">MISS</div>`; }
-                    else disp=`<div class="val">--</div>`;
-                }
-                container.innerHTML += `<div class="card ${cls}" onclick="handleClick('${id}','${k}')"><span>${i} ${mNames[m-1]}</span>${disp}</div>`;
+                if(id==='gGrid') { let s = db.g[k]||0; disp = `<div class="val">${s==1?'DONE':s==2?'MISS':'--'}</div>`; }
+                
+                container.innerHTML += `<div class="card ${isToday}" onclick="handleClick('${id}','${k}')"><span>${i} ${mNames[m-1]}</span>${disp}</div>`;
             }
         });
     }
@@ -269,47 +245,50 @@
     function handleClick(id, k) {
         activeK = k;
         if(id==='hGrid') {
-            let add = prompt(`Add water for ${k} (mL):`, "250");
+            let add = prompt(`Add Water (mL):`, "250");
             if(add) { db.w[k] = (db.w[k]||0) + parseInt(add); refresh(); }
         }
-        if(id==='wtGrid') { document.getElementById('wtTitle').innerText = "Weight: " + k; document.getElementById('weightVal').value = db.wt[k]||""; document.getElementById('wtModal').style.display='flex'; }
+        if(id==='wtGrid') { document.getElementById('weightVal').value = db.wt[k]||""; document.getElementById('wtModal').style.display='flex'; }
         if(id==='dGrid') openDiet(k);
         if(id==='gGrid') { db.g[k] = ((db.g[k] || 0) + 1) % 3; refresh(); }
     }
 
-    function addWaterToday() { 
-        const todayK = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
-        db.w[todayK] = (db.w[todayK] || 0) + (parseInt(document.getElementById('wInput').value) || 0); 
-        document.getElementById('wInput').value=""; refresh(); 
+    function clearDietDay() {
+        if(!activeK) return;
+        if(confirm(`Reset diet for ${activeK}?`)) { db.m[activeK] = {p:0, c:0, f:0, cal:0}; refresh(); }
     }
-    function clearSpecificDay() {
-        const vM = document.getElementById('jumpMonth').value;
-        const vY = document.getElementById('jumpYear').value;
-        const day = prompt(`Day in ${vM}/${vY}:`, new Date().getDate());
-        if (day) {
-            const targetK = `${vY}-${vM}-${day}`;
-            if(confirm(`Wipe diet data for ${targetK}?`)) { db.m[targetK] = {p:0, c:0, f:0, cal:0}; refresh(); }
-        }
+
+    function saveToLib() {
+        let name = document.getElementById('ln').value;
+        if(!name) return;
+        db.lib.push({ n: name, p: parseFloat(document.getElementById('lp').value)||0, c: parseFloat(document.getElementById('lc').value)||0, f: parseFloat(document.getElementById('lf').value)||0, cal: parseFloat(document.getElementById('lcal').value)||0 });
+        ['ln','lp','lc','lf','lcal'].forEach(id => document.getElementById(id).value = "");
+        refresh();
     }
+
     function openDiet(k) {
         tempDraft = { breakfast:[], lunch:[], snacks:[], dinner:[] };
         document.getElementById('dietDateTitle').innerText = "Log: " + k;
-        const opts = '<option value="">-- Lib --</option>' + db.lib.map((x,i) => `<option value="${i}">${x.n}</option>`).join('');
-        document.querySelectorAll('.food-sel').forEach(sel => { sel.innerHTML = opts; sel.value = ""; });
-        renderMealLists(); document.getElementById('dietModal').style.display='flex';
+        const opts = '<option value="">-- Food --</option>' + db.lib.map((x,i) => `<option value="${i}">${x.n}</option>`).join('');
+        document.querySelectorAll('.food-sel').forEach(sel => sel.innerHTML = opts);
+        renderMealLists();
+        document.getElementById('dietModal').style.display = 'flex';
     }
+
     function addToMeal(key) {
         const s = document.getElementById(`sel-${key}`), gI = document.getElementById(`gram-${key}`);
         if(!s.value || !gI.value) return;
         const f = db.lib[s.value], g = parseFloat(gI.value);
-        tempDraft[key].push({ n: f.n, p: Math.round((f.p/100)*g), c: Math.round((f.c/100)*g), f: Math.round((f.f/100)*g), cal: Math.round((f.cal/100)*g), g: g });
+        tempDraft[key].push({ n: f.n, p: Math.round((f.p/100)*g), c: Math.round((f.c/100)*g), f: Math.round((f.f/100)*g), cal: Math.round((f.cal/100)*g) });
         s.value = ""; gI.value = ""; renderMealLists();
     }
+
     function renderMealLists() {
-        ['breakfast','lunch','snacks','dinner'].forEach(k => {
-            document.getElementById(`list-${k}`).innerHTML = tempDraft[k].map(x => `<div style="font-size:0.6rem; opacity:0.7;">• ${x.n}</div>`).join('');
+        ['breakfast','lunch','dinner'].forEach(k => {
+            document.getElementById(`list-${k}`).innerHTML = tempDraft[k].map(x => `• ${x.n}`).join('<br>');
         });
     }
+
     function finalSaveToDay() {
         if(!db.m[activeK]) db.m[activeK] = {p:0, c:0, f:0, cal:0};
         Object.keys(tempDraft).forEach(key => {
@@ -317,25 +296,21 @@
         });
         closeModals(); refresh();
     }
+
     function saveWeight() { db.wt[activeK] = parseFloat(document.getElementById('weightVal').value); closeModals(); refresh(); }
-    function saveToLib() {
-        if(!document.getElementById('ln').value) return;
-        db.lib.push({ n: document.getElementById('ln').value, p: parseFloat(document.getElementById('lp').value)||0, c: parseFloat(document.getElementById('lc').value)||0, f: parseFloat(document.getElementById('lf').value)||0, cal: parseFloat(document.getElementById('lcal').value)||0 });
-        ['ln','lp','lc','lf','lcal'].forEach(i => document.getElementById(i).value=""); refresh();
+    
+    function addWaterToday() { 
+        const now = new Date();
+        const tK = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+        db.w[tK] = (db.w[tK] || 0) + (parseInt(document.getElementById('wInput').value) || 0); 
+        document.getElementById('wInput').value=""; refresh(); 
     }
-    function renderLib() { document.getElementById('libDisplay').innerHTML = db.lib.map((x,i) => `<div style="display:flex; justify-content:space-between; font-size:0.8rem; border-bottom:1px solid var(--glass-border); padding:8px 0;"><b>${x.n}</b> <span style="color:red; cursor:pointer" onclick="db.lib.splice(${i},1);refresh()">✖</span></div>`).join(''); }
+
+    function renderLib() { document.getElementById('libDisplay').innerHTML = db.lib.map((x,i) => `<div style="font-size:0.85rem; border-bottom:1px solid var(--glass-border); padding:12px 0;">${x.n} <span style="color:var(--danger); cursor:pointer; float:right; font-weight:800;" onclick="db.lib.splice(${i},1);refresh()">DELETE</span></div>`).join(''); }
+    
     function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 
-    function init() {
-        const mSel = document.getElementById('jumpMonth');
-        const ySel = document.getElementById('jumpYear');
-        ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].forEach((m, i) => mSel.innerHTML += `<option value="${i+1}">${m}</option>`);
-        for(let y=2025; y<=2030; y++) ySel.innerHTML += `<option value="${y}">${y}</option>`;
-        mSel.value = new Date().getMonth() + 1;
-        ySel.value = new Date().getFullYear();
-        setTimeout(() => showTab('h', document.querySelector('.tab-btn')), 100);
-    }
-    window.onload = init;
+    window.onload = () => { setTimeout(() => showTab('h', document.getElementById('btn-h')), 100); };
 </script>
 </body>
 </html>
